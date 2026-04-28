@@ -18,7 +18,7 @@ export const getLatestThingSpeakData = async (): Promise<ThingSpeakFeed | null> 
 
     if (!data?.feeds?.length) return null;
 
-    return data.feeds[0];
+    return data;
   } catch (error) {
     console.error("ThingSpeak fetch error:", error);
     return null;
