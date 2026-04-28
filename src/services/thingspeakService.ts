@@ -11,14 +11,10 @@ interface ThingSpeakFeed {
 
 export const getLatestThingSpeakData = async (): Promise<ThingSpeakFeed | null> => {
   try {
-    const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json`;
+    const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/fields/1.json?api_key=${READ_API_KEY}&res`;
+    // const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json`;
 
-    const { data } = await axios.get(url, {
-      params: {
-        api_key: READ_API_KEY,
-        results: 1,
-      },
-    });
+    const { data } = await axios.get(url);
 
     if (!data?.feeds?.length) return null;
 
