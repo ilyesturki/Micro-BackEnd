@@ -97,6 +97,7 @@ class User extends Model {
   @Column(DataType.BOOLEAN)
   pwResetVerified!: boolean;
 
+
   @BeforeSave
   static setDefaultImage(instance: User) {
     if (!instance.image) {

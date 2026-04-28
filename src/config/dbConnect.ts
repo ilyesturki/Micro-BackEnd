@@ -4,6 +4,9 @@ import User from "../models/User";
 import Notification from "../models/Notification";
 
 import DeviceToken from "../models/DeviceToken";
+import Parking from "../models/Parking";
+import ParkingSpot from "../models/ParkingSpot";
+
 
 const dbConnect = () => {
   const sequelize = new Sequelize({
@@ -16,7 +19,9 @@ const dbConnect = () => {
     models: [
       User,
       Notification,
-      DeviceToken
+      DeviceToken,
+      Parking,
+      ParkingSpot
     ], 
     logging: false,
   });

@@ -14,6 +14,8 @@ import User from "./models/User";
 import Notification from "./models/Notification";
 
 import DeviceToken from "./models/DeviceToken";
+import Parking from "./models/Parking";
+import ParkingSpot from "./models/ParkingSpot";
 import { startThingSpeakWatcher } from "./services/thingspeakWatcherService";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
@@ -27,6 +29,8 @@ sequelize.addModels([
   User,
   Notification,
   DeviceToken,
+  Parking,
+  ParkingSpot
 ]);
 
 (async () => {
