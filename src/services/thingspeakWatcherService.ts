@@ -11,38 +11,73 @@ export const startThingSpeakWatcher = (io: SocketIOServer) => {
       console.log(data);
       if (!data) return;
 
-      if (data.entry_id === lastEntryId) return;
+      const latestFeed = data.feeds?.[data.feeds.length - 1];
+      if (!latestFeed) return;
 
-      lastEntryId = data.entry_id;
+      if (latestFeed.entry_id === lastEntryId) return;
+      lastEntryId = latestFeed.entry_id;
 
-      const spots = await ParkingSpot.findAll();
+      const dbSpots = await ParkingSpot.findAll();
 
-      let hasChanges = false;
+      // ---------------------------
+      // 1. Build active sensor map from ThingSpeak
+      // ---------------------------
+      const activeSensors = Object.entries(latestFeed)
+        .filter(([key]) => key.startsWith("field"))
+        .map(([field, value]) => ({
+          sensorField: field,
+          status: value === "1" ? "occupied" : "available",
+        }));
 
-      for (const spot of spots) {
-        const sensorValue = data[spot.sensorField];
+      // ---------------------------
+      // 2. DELETE spots not in ThingSpeak
+      // ---------------------------
+      for (const dbSpot of dbSpots) {
+        const existsInFeed = activeSensors.find(
+          (s) => s.sensorField === dbSpot.sensorField
+        );
 
-        if (sensorValue === undefined) continue;
-
-        const newStatus =
-          sensorValue === "1" ? "occupied" : "available";
-
-        if (spot.status !== newStatus) {
-          spot.status = newStatus;
-          await spot.save();
-          hasChanges = true;
+        if (!existsInFeed) {
+          await dbSpot.destroy();
         }
       }
 
-      if (hasChanges) {
-        const updatedSpots = await ParkingSpot.findAll();
+      // ---------------------------
+      // 3. CREATE or UPDATE spots
+      // ---------------------------
+      for (const sensor of activeSensors) {
+        let spot = dbSpots.find(
+          (s) => s.sensorField === sensor.sensorField
+        );
 
-        io.emit("parking-updated", updatedSpots);
+        // CREATE if missing
+        if (!spot) {
+          await ParkingSpot.create({
+            spotNumber: sensor.sensorField.toUpperCase(),
+            sensorField: sensor.sensorField,
+            status: sensor.status,
+          });
 
-        console.log("Parking spots updated");
+          continue;
+        }
+
+        // UPDATE if changed
+        if (spot.status !== sensor.status) {
+          spot.status = sensor.status;
+          await spot.save();
+        }
       }
+
+      // ---------------------------
+      // 4. Send updated state to frontend
+      // ---------------------------
+      const updatedSpots = await ParkingSpot.findAll();
+
+      io.emit("parking-updated", updatedSpots);
+
+      console.log("🚗 Parking fully synced with ThingSpeak");
     } catch (error) {
-      console.error("Watcher error:", error);
+      console.error("Sync error:", error);
     }
   }, 15000);
 };
