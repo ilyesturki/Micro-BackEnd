@@ -25,6 +25,12 @@ import extractUserId from "../middlewares/extractUserId";
 
 const router = express.Router();
 
+
+router
+  .route("/")
+  .get(getUsers)
+  .post(uploadUserImage, resizeUserImage, createUserValidator, createUser);
+  
 router.use(protect);
 
 router
@@ -40,10 +46,7 @@ router
 
 // router.use(allowedTo("admin"));
 
-router
-  .route("/")
-  .get(getUsers)
-  .post(uploadUserImage, resizeUserImage, createUserValidator, createUser);
+
 
 router
   .route("/:id")
