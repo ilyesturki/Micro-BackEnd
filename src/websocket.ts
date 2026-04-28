@@ -3,6 +3,7 @@ import { Server } from "http";
 import { socketAuthMiddleware } from "./middlewares/socketAuth";
 import Notification from "./models/Notification";
 import { fn, col } from "sequelize";
+import ParkingSpot from "./models/ParkingSpot";
 export const setupWebSocket = (server: Server) => {
   const io = new SocketIOServer(server, {
     cors: {
@@ -20,23 +21,20 @@ export const setupWebSocket = (server: Server) => {
 
       socket.join(`user_${userId}`);
 
-      Notification.count({ where: { userId, status: "unread" } })
-        .then((unreadCount) =>
-          socket.emit("unreadNotificationCount", unreadCount)
-        )
-        .catch((error) => console.error("Error fetching unread count:", error));
+      // Notification.count({ where: { userId, status: "unread" } })
+      //   .then((unreadCount) =>
+      //     socket.emit("unreadNotificationCount", unreadCount)
+      //   )
+      //   .catch((error) => console.error("Error fetching unread count:", error));
 
-      Notification.findAll({
+      ParkingSpot.findAll({
         where: { userId },
         order: [["createdAt", "DESC"]],
         attributes: [
           "id",
-          "title",
-          "message",
-          "sender",
-          "fpsId",
+          "spotNumber",
+          "sensorField",
           "status",
-          "priority",
           "actionLink",
           "createdAt", 
           [
@@ -46,7 +44,7 @@ export const setupWebSocket = (server: Server) => {
         ],
       })
         .then((notifications) =>
-          socket.emit("updatedNotifications", notifications)
+          socket.emit("parking-updated", notifications)
         )
         .catch((error) =>
           console.error("Error fetching notifications:", error)
