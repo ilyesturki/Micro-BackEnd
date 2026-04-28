@@ -38,7 +38,7 @@ router
     updateUser
   );
 
-router.use(allowedTo("admin"));
+// router.use(allowedTo("admin"));
 
 router
   .route("/")

@@ -3,32 +3,32 @@ import validatorMiddleware from "../../middlewares/validatorMiddleware";
 import { bodySanitizer } from "../../middlewares/sanitizer";
 
 export const verifyTokenValidator = [
-  bodySanitizer("token", "mat"),
+  bodySanitizer("token", "email"),
   body("token")
     .notEmpty()
     .withMessage("Token required")
     .isString()
     .withMessage("Invalid Token"),
-  body("mat")
+    body("email")
     .notEmpty()
-    .withMessage("Mat required")
-    .isString()
-    .withMessage("Invalid Mat"),
+    .withMessage("email is required")
+    .isEmail()
+    .withMessage("Invalid email address"),
   validatorMiddleware,
 ];
 
 export const setPasswordValidator = [
-  bodySanitizer("token", "mat", "newPassword"),
+  bodySanitizer("token", "email", "newPassword"),
   body("token")
     .notEmpty()
     .withMessage("Token required")
     .isString()
     .withMessage("Invalid Token"),
-  body("mat")
+    body("email")
     .notEmpty()
-    .withMessage("Mat required")
-    .isString()
-    .withMessage("Invalid Mat"),
+    .withMessage("email is required")
+    .isEmail()
+    .withMessage("Invalid email address"),
   body("newPassword").notEmpty().withMessage("New password required"),
   validatorMiddleware,
 ];

@@ -41,21 +41,12 @@ export const getLoggedUserValidator: RequestHandler[] = [
 
 export const createUserValidator = [
   bodySanitizer(
-    "mat",
     "firstName",
     "lastName",
     "email",
     "phone",
-    "role",
-    "userCategory",
-    "userService",
     "image"
   ),
-  body("mat")
-    .notEmpty()
-    .withMessage("mat is required")
-    .isLength({ min: 8, max: 8 })
-    .withMessage("mat must be 8 characters long"),
   body("firstName")
     .notEmpty()
     .withMessage("firstName is required")
@@ -80,47 +71,18 @@ export const createUserValidator = [
     .withMessage("phone is required")
     .isMobilePhone(["ar-TN"])
     .withMessage("Invalid phone number only accepted TN Phone numbers"),
-
-  body("role")
-    .optional()
-    .isIn(["user", "admin"])
-    .withMessage("role must be user or admin"),
-  body("userCategory")
-    .optional()
-    .isIn(["corporaite", "top-management", "midel-management", "operational"])
-    .withMessage("select a valid user category"),
-  body("userService")
-    .optional()
-    .isIn([
-      "productions",
-      "maintenance",
-      "logistique",
-      "qualité",
-      "ip",
-      "R&D",
-      "autre",
-    ])
-    .withMessage("select a valid user service"),
   body("image").optional().isString().withMessage("image must be a string"),
   validatorMiddleware,
 ];
 export const updateUserValidator = [
   paramsSanitizer("id"),
   bodySanitizer(
-    "mat",
     "firstName",
     "lastName",
     "email",
     "phone",
-    "role",
-    "userCategory",
-    "userService",
     "image"
   ),
-  body("mat")
-    .optional()
-    .isLength({ min: 8, max: 8 })
-    .withMessage("mat must be 8 characters long"),
   body("firstName")
     .optional()
     .isLength({ min: 3 })
@@ -139,26 +101,6 @@ export const updateUserValidator = [
     .isMobilePhone(["ar-TN"])
     .withMessage("Invalid phone number only accepted TN Phone numbers"),
 
-  body("role")
-    .optional()
-    .isIn(["user", "admin"])
-    .withMessage("role must be user or admin"),
-  body("userCategory")
-    .optional()
-    .isIn(["corporaite", "top-management", "midel-management", "operational"])
-    .withMessage("select a valid user category"),
-  body("userService")
-    .optional()
-    .isIn([
-      "productions",
-      "maintenance",
-      "logistique",
-      "qualité",
-      "ip",
-      "R&D",
-      "autre",
-    ])
-    .withMessage("select a valid user service"),
   body("image").optional().isString().withMessage("image must be a string"),
   validatorMiddleware,
 ];

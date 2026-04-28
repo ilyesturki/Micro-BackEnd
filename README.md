@@ -1,2 +1,1 @@
-# ARADIS-BackEnd
 # Micro-BackEnd

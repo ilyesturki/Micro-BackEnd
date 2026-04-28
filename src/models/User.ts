@@ -11,16 +11,11 @@ import {
   HasMany,
   Index,
 } from "sequelize-typescript";
-import Fps from "./Fps";
 
 @Table({
   tableName: "users",
   timestamps: true, 
   indexes: [
-    {
-      unique: true,
-      fields: ["mat"],
-    },
     {
       unique: true,
       fields: ["email"],
@@ -33,10 +28,6 @@ class User extends Model {
   @Column(DataType.INTEGER)
   id!: number;
 
-  @AllowNull(false)
-  @Index({ unique: true })
-  @Column(DataType.STRING)
-  mat!: string;
 
   @AllowNull(false)
   @Column(DataType.STRING)
@@ -76,37 +67,6 @@ class User extends Model {
   })
   password?: string;
 
-  @Default("operational")
-  @AllowNull(false)
-  @Column(
-    DataType.ENUM(
-      "corporaite",
-      "top-management",
-      "midel-management",
-      "operational"
-    )
-  )
-  userCategory!: string;
-
-  @Default("autre")
-  @AllowNull(false)
-  @Column(
-    DataType.ENUM(
-      "productions",
-      "maintenance",
-      "logistique",
-      "qualité",
-      "ip",
-      "R&D",
-      "autre"
-    )
-  )
-  userService!: string;
-
-  @Default("user")
-  @AllowNull(false)
-  @Column(DataType.ENUM("user", "admin"))
-  role!: "user" | "admin";
 
   @Default("pending")
   @AllowNull(false)
@@ -144,20 +104,16 @@ class User extends Model {
     }
   }
 
-  @HasMany(() => Fps)
-  fpsRecords!: Fps[];
 }
 
 export interface UserType {
   id: number;
-  mat: string;
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
   image?: string;
   password?: string;
-  role: "user" | "admin";
   status: "pending" | "active" | "inactive";
   activationToken?: string;
   activationTokenExpires?: Date;

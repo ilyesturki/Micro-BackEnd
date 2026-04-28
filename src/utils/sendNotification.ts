@@ -26,43 +26,17 @@ export const sendNotification = async (
         : null,
     });
 
-    
 
-
-
-
-    const tokens = await DeviceToken.findAll({
-      where: { userId:data.userId, isActive: true },
-    });
-    console.log(tokens);
-    if (tokens.length) {
-      const messages = tokens.map((t) => ({
-        to: t.token,
-        title: data.title,
-        body:data.message,
-      }));
-      console.log(messages);
-      const response = await fetch("https://exp.host/--/api/v2/push/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify(messages),
-      });
-  
-    }
-
-    const unreadCount = await Notification.count({
-      where: { userId: data.userId, status: "unread" },
-    });
+    // const unreadCount = await Notification.count({
+    //   where: { userId: data.userId, status: "unread" },
+    // });
 
     const notifications = await Notification.findAll({
       where: { userId: data.userId },
       order: [["createdAt", "DESC"]],
     });
     io.to(`user_${data.userId}`).emit("updatedNotifications", notifications);
-    io.to(`user_${data.userId}`).emit("unreadNotificationCount", unreadCount);
+    // io.to(`user_${data.userId}`).emit("unreadNotificationCount", unreadCount);
   } catch (error) {
     console.error("Error sending notification:", error);
   }

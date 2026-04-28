@@ -11,28 +11,21 @@ import activationEmailTemplate from "../utils/emailTemplate/activationEmailTempl
 export const createUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const {
-      mat,
       firstName,
       lastName,
-      role,
-      userCategory,
-      userService,
       email,
       phone,
-      image,
+      image
     } = req.body;
 
     console.log(
-      mat,
       email,
       phone,
       firstName,
       lastName,
-      image,
-      userCategory,
-      userService
+      image
     );
-    const existingUser = await User.findOne({ where: { mat: mat } });
+    const existingUser = await User.findOne({ where: { email: email } });
 
     if (existingUser) {
       if (existingUser.status === "active") {
@@ -43,12 +36,8 @@ export const createUser = asyncHandler(
     }
 
     const user = await User.create({
-      mat,
       firstName,
       lastName,
-      role,
-      userCategory,
-      userService,
       email,
       phone,
       status: "pending",

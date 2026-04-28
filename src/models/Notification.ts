@@ -10,7 +10,6 @@ import {
   AutoIncrement,
 } from "sequelize-typescript";
 import User from "./User";
-import Fps from "./Fps";
 
 @Table({ tableName: "notifications", timestamps: true })
 class Notification extends Model {
@@ -32,9 +31,6 @@ class Notification extends Model {
   @Column(DataType.INTEGER)
   userId!: number; 
 
-  @ForeignKey(() => Fps)
-  @Column(DataType.STRING)
-  fpsId!: string; 
 
   @Default("unread")
   @Column(DataType.ENUM("unread", "read"))

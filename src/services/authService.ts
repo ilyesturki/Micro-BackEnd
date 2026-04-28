@@ -50,9 +50,9 @@ export const removeDeviceToken = asyncHandler(
 
 export const verifyToken = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { token, mat } = req.body;
+    const { token, email } = req.body;
 
-    if (!token || !mat) {
+    if (!token || !email) {
       return next(new ApiError("Invalid request parameters", 400));
     }
 
@@ -60,7 +60,7 @@ export const verifyToken = asyncHandler(
 
     const user = await User.findOne({
       where: {
-        mat,
+        email,
         activationToken: hashedToken,
         activationTokenExpires: { [Op.gt]: new Date() }, 
       },
@@ -79,9 +79,9 @@ export const verifyToken = asyncHandler(
 
 export const setPassword = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { token, mat, newPassword } = req.body;
+    const { token, email, newPassword } = req.body;
 
-    if (!token || !mat || !newPassword) {
+    if (!token || !email || !newPassword) {
       return next(new ApiError("Invalid request parameters", 400));
     }
 
@@ -89,7 +89,7 @@ export const setPassword = asyncHandler(
 
     const user = await User.findOne({
       where: {
-        mat,
+        email,
         activationToken: hashedToken,
         activationTokenExpires: { [Op.gt]: new Date() },
       },
@@ -269,10 +269,10 @@ export const protect = asyncHandler(
 
 export const allowedTo = (...roles: string[]) =>
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    if (req.user && !roles.includes(req.user.role)) {
-      return next(
-        new ApiError("You are not allowed to access this route", 403)
-      );
-    }
+    // if (req.user && !roles.includes(req.user.role)) {
+    //   return next(
+    //     new ApiError("You are not allowed to access this route", 403)
+    //   );
+    // }
     next();
   });

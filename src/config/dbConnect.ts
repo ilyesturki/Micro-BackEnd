@@ -1,18 +1,8 @@
 import { Sequelize } from "sequelize-typescript";
 import User from "../models/User";
-import Fps from "../models/Fps";
-import FpsProblem from "../models/FpsProblem";
-import FpsImmediateActions from "../models/FpsImmediateActions";
-import FpsCause from "../models/FpsCause";
-import FpsDefensiveAction from "../models/FpsDefensiveAction";
-import ImmediateActions from "../models/ImmediateActions";
-import SortingResults from "../models/SortingResults";
-import FpsComment from "../models/FpsComment";
-import FpsHelper from "../models/FpsHelper";
+
 import Notification from "../models/Notification";
-import Tag from "../models/Tag";
-import TagAction from "../models/TagAction";
-import TagHelper from "../models/TagHelper";
+
 import DeviceToken from "../models/DeviceToken";
 
 const dbConnect = () => {
@@ -25,18 +15,6 @@ const dbConnect = () => {
     port: Number(process.env.DB_PORT) || 3306,
     models: [
       User,
-      Fps,
-      Tag,
-      TagAction,
-      TagHelper,
-      FpsProblem,
-      FpsImmediateActions,
-      FpsCause,
-      FpsDefensiveAction,
-      ImmediateActions,
-      SortingResults,
-      FpsComment,
-      FpsHelper,
       Notification,
       DeviceToken
     ], 
