@@ -1,5 +1,4 @@
 import axios from "axios";
-
 const CHANNEL_ID = process.env.THINGSPEAK_CHANNEL_ID!;
 const READ_API_KEY = process.env.THINGSPEAK_READ_API_KEY!;
 
