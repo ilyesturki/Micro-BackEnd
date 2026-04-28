@@ -9,6 +9,7 @@ import ApiError from "./utils/ApiError";
 import authRoute from "./routes/authRoute";
 import userRoute from "./routes/userRoute";
 import notificationRoute from "./routes/notificationRoute";
+import parkingRoute from "./routes/parkingRoute";
 import { setupWebSocket } from "./websocket";
 import User from "./models/User";
 import Notification from "./models/Notification";
@@ -55,6 +56,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/auth", authRoute);
 app.use("/users", userRoute);
 app.use("/notifications", notificationRoute);
+app.use("/parking", parkingRoute);
 
 app.use("*", (req: Request, res: Response, next: NextFunction) => {
   next(new ApiError("Can't find this route", 404));
