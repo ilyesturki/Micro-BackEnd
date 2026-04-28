@@ -15,7 +15,7 @@ export const startThingSpeakWatcher = (io: SocketIOServer) => {
       console.log(latestFeed);
       if (!latestFeed) return;
 
-      if (latestFeed.entry_id === lastEntryId) return;
+      // if (latestFeed.entry_id === lastEntryId) return;
       lastEntryId = latestFeed.entry_id;
       console.log(lastEntryId);
       // ONLY ONE SENSOR
@@ -47,7 +47,7 @@ export const startThingSpeakWatcher = (io: SocketIOServer) => {
       }
 
       const updatedSpots = await ParkingSpot.findAll();
-
+      console.log(updatedSpots);
       io.emit("parking-updated", updatedSpots);
 
       console.log("🚗 Single spot updated");
