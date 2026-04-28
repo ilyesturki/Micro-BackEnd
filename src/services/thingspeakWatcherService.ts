@@ -8,7 +8,7 @@ export const startThingSpeakWatcher = (io: SocketIOServer) => {
   setInterval(async () => {
     try {
       const data = await getLatestThingSpeakData();
-
+      console.log(data);
       if (!data) return;
 
       if (data.entry_id === lastEntryId) return;
