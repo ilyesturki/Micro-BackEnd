@@ -51,7 +51,6 @@ export const startQrGenerator = (io: Server) => {
   }, 30000);
 };
 
-// ✅ VERIFY QR + INSTANT REFRESH
 export const verifyQr = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { qrId } = req.body;
@@ -59,16 +58,14 @@ export const verifyQr = asyncHandler(
     if (!qrId) {
       return next(new ApiError("QR ID required", 400));
     }
-    console.log("111111111111111111");
-    console.log(qrId);
+
     const qr = await QrSession.findOne({
       where: {
         qrId,
         used: false,
       },
     });
-    console.log(qr);
-    console.log("111111111111111111");
+
     if (!qr) {
       return next(new ApiError("QR expired or already used", 400));
     }
@@ -77,14 +74,58 @@ export const verifyQr = asyncHandler(
     qr.used = true;
     await qr.save();
 
+    // 🚀 TRIGGER THINGSPEAK (OPEN GATE)
+    try {
+      await fetch(
+        "https://api.thingspeak.com/update?api_key=S64WUH2AGF2RLQYU&field2=1",
+        {
+          method: "GET",
+        }
+      );
+    } catch (err) {
+      console.error("ThingSpeak error:", err);
+      // ❗ we do NOT block response if IoT fails
+    }
+
+    // 🚀 RESPONSE TO FRONTEND
     res.status(200).json({
       message: "🚪 Gate opened successfully",
     });
+
     // 🚀 INSTANT NEW QR (NO WAIT)
     await generateAndEmitQr();
   }
 );
 
+// ✅ VERIFY QR + INSTANT REFRESH
+// export const verifyQr = asyncHandler(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const { qrId } = req.body;
+
+//     if (!qrId) {
+//       return next(new ApiError("QR ID required", 400));
+//     }
+//     const qr = await QrSession.findOne({
+//       where: {
+//         qrId,
+//         used: false,
+//       },
+//     });
+//     if (!qr) {
+//       return next(new ApiError("QR expired or already used", 400));
+//     }
+
+//     // ✅ mark as used
+//     qr.used = true;
+//     await qr.save();
+
+//     res.status(200).json({
+//       message: "🚪 Gate opened successfully",
+//     });
+//     // 🚀 INSTANT NEW QR (NO WAIT)
+//     await generateAndEmitQr();
+//   }
+// );
 // import { Server } from "socket.io";
 // import { v4 as uuidv4 } from "uuid";
 // import QrSession from "../models/QrSession";
