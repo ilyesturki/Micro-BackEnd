@@ -23,8 +23,7 @@ export const startQrGenerator = (io: Server) => {
       console.log(payload);
       console.log(qrImage);
 
-      // SEND ONLY TO DOOR SCREEN
-      io.to("door_screen").emit("qr-updated", {
+      io.emit("qr-updated", {
         qr: qrImage,
         qrId,
       });
