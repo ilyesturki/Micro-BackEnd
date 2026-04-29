@@ -77,12 +77,11 @@ export const verifyQr = asyncHandler(
     qr.used = true;
     await qr.save();
 
-    // 🚀 INSTANT NEW QR (NO WAIT)
-    await generateAndEmitQr();
-
     res.status(200).json({
       message: "🚪 Gate opened successfully",
     });
+    // 🚀 INSTANT NEW QR (NO WAIT)
+    await generateAndEmitQr();
   }
 );
 
