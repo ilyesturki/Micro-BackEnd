@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
-import { QrSession } from "../models/QrSession";
+import QrSession  from "../models/QrSession";
 import { createTempQRCode } from "../utils/createTempQrCode";
 
 export const startQrGenerator = (io: Server) => {
@@ -19,6 +19,9 @@ export const startQrGenerator = (io: Server) => {
       const payload = JSON.stringify({ qrId });
 
       const qrImage = await createTempQRCode(payload);
+
+      console.log(payload);
+      console.log(qrImage);
 
       // SEND ONLY TO DOOR SCREEN
       io.to("door_screen").emit("qr-updated", {

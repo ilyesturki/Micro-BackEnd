@@ -1,7 +1,7 @@
 import { Table, Column, Model, DataType } from "sequelize-typescript";
 
 @Table
-export class QrSession extends Model {
+class QrSession extends Model {
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -21,3 +21,5 @@ export class QrSession extends Model {
   })
   used!: boolean;
 }
+
+export default QrSession;
