@@ -65,7 +65,6 @@ export const verifyQr = asyncHandler(
       where: {
         qrId,
         used: false,
-        expiresAt: { [Op.gt]: new Date() },
       },
     });
     console.log(qr);
