@@ -2,9 +2,11 @@ import { Server as SocketIOServer } from "socket.io";
 import { Server } from "http";
 import { socketAuthMiddleware } from "./middlewares/socketAuth";
 import Notification from "./models/Notification";
-import { fn, col } from "sequelize";
+import { fn, col, Op } from "sequelize";
 import ParkingSpot from "./models/ParkingSpot";
 import { startQrGenerator } from "./services/qrGeneratorService";
+import QrSession from "./models/QrSession";
+import { createTempQRCode } from "./utils/createTempQrCode";
 export const setupWebSocket = (server: Server) => {
   const io = new SocketIOServer(server, {
     cors: {
@@ -22,11 +24,30 @@ export const setupWebSocket = (server: Server) => {
 
       socket.join(`user_${userId}`);
 
-      // DOOR SCREEN ROOM
-      socket.on("join-door-screen", () => {
-        socket.join("door_screen");
-        console.log("🚪 Door screen joined");
-      });
+      // // DOOR SCREEN ROOM
+      // socket.on("join-door-screen", () => {
+      //   socket.join("door_screen");
+      //   console.log("🚪 Door screen joined");
+      // });
+
+      QrSession.findOne({
+        where: {
+          used: false,
+          expiresAt: { [Op.gt]: new Date() },
+        },
+      })
+        .then(async (qr) => {
+          if (!qr) return;
+
+          const payload = JSON.stringify({ qrId: qr.qrId });
+          const qrImage = await createTempQRCode(payload);
+
+          socket.emit("qr-updated", {
+            qr: qrImage,
+            qrId: qr.qrId,
+          });
+        })
+        .catch((error) => console.error("Error fetching QR session:", error));
 
       // Notification.count({ where: { userId, status: "unread" } })
       //   .then((unreadCount) =>
@@ -43,16 +64,14 @@ export const setupWebSocket = (server: Server) => {
           "sensorField",
           "status",
           "actionLink",
-          "createdAt", 
+          "createdAt",
           [
             fn("DATE_FORMAT", col("createdAt"), "%Y-%m-%d %H:%i:%s"),
             "formattedDate",
-          ], 
+          ],
         ],
       })
-        .then((notifications) =>
-          socket.emit("parking-updated", notifications)
-        )
+        .then((notifications) => socket.emit("parking-updated", notifications))
         .catch((error) =>
           console.error("Error fetching notifications:", error)
         );
@@ -69,4 +88,3 @@ export const setupWebSocket = (server: Server) => {
   startQrGenerator(io);
   return io;
 };
-
