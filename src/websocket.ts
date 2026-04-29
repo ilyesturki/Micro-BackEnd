@@ -4,6 +4,7 @@ import { socketAuthMiddleware } from "./middlewares/socketAuth";
 import Notification from "./models/Notification";
 import { fn, col } from "sequelize";
 import ParkingSpot from "./models/ParkingSpot";
+import { startQrGenerator } from "./services/qrGeneratorService";
 export const setupWebSocket = (server: Server) => {
   const io = new SocketIOServer(server, {
     cors: {
@@ -20,6 +21,12 @@ export const setupWebSocket = (server: Server) => {
       const userId = socket.data.user.id;
 
       socket.join(`user_${userId}`);
+
+      // DOOR SCREEN ROOM
+      socket.on("join-door-screen", () => {
+        socket.join("door_screen");
+        console.log("🚪 Door screen joined");
+      });
 
       // Notification.count({ where: { userId, status: "unread" } })
       //   .then((unreadCount) =>
@@ -58,6 +65,8 @@ export const setupWebSocket = (server: Server) => {
     }
   });
 
+  // START QR SYSTEM
+  startQrGenerator(io);
   return io;
 };
 

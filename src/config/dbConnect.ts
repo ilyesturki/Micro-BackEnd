@@ -6,6 +6,7 @@ import Notification from "../models/Notification";
 import DeviceToken from "../models/DeviceToken";
 import Parking from "../models/Parking";
 import ParkingSpot from "../models/ParkingSpot";
+import QrSession from "../models/QrSession";
 
 
 const dbConnect = () => {
@@ -21,7 +22,8 @@ const dbConnect = () => {
       Notification,
       DeviceToken,
       Parking,
-      ParkingSpot
+      ParkingSpot,
+      QrSession
     ], 
     logging: false,
   });
