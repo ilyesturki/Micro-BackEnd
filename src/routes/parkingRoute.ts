@@ -12,7 +12,9 @@ router.route("/").get(getParkingSpots);
 router.post(
   "/door",
   (req, res, next) => {
+    console.log("111111111111111111");
     console.log(req.body);
+    console.log("111111111111111111");
     next();
   },
   verifyQr

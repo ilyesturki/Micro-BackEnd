@@ -59,7 +59,8 @@ export const verifyQr = asyncHandler(
     if (!qrId) {
       return next(new ApiError("QR ID required", 400));
     }
-
+    console.log("111111111111111111");
+    console.log(qrId);
     const qr = await QrSession.findOne({
       where: {
         qrId,
@@ -67,7 +68,8 @@ export const verifyQr = asyncHandler(
         expiresAt: { [Op.gt]: new Date() },
       },
     });
-
+    console.log(qr);
+    console.log("111111111111111111");
     if (!qr) {
       return next(new ApiError("QR expired or already used", 400));
     }
