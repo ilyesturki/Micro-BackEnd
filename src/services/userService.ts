@@ -45,9 +45,11 @@ export const createUser = asyncHandler(
     const activationUrl = `${process.env.FRONTEND_URL}/auth/activate?token=${activationToken}`;
     console.log("/*/*/*/*/*/*/*/*/*/*");
     try {
-      await sendEmail(
+      console.log(user.firstName, user.email);
+      const test = await sendEmail(
         activationEmailTemplate(user.firstName, user.email, activationUrl)
       );
+      console.log(test);
       console.log("/*/*/*/*/*/*/*/*/*/*");
     } catch (err) {
       user.activationToken = undefined;
