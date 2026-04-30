@@ -7,31 +7,18 @@ import ApiError from "../utils/ApiError";
 import sendEmail from "../utils/sendEmail";
 import activationEmailTemplate from "../utils/emailTemplate/activationEmailTemplate ";
 
-
 export const createUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const {
-      firstName,
-      lastName,
-      email,
-      phone,
-      image
-    } = req.body;
+    const { firstName, lastName, email, phone, image } = req.body;
 
-    console.log(
-      email,
-      phone,
-      firstName,
-      lastName,
-      image
-    );
+    console.log(email, phone, firstName, lastName);
     const existingUser = await User.findOne({ where: { email: email } });
 
     if (existingUser) {
       if (existingUser.status === "active") {
         return next(new ApiError("User already exists", 400));
       } else {
-        await existingUser.destroy(); 
+        await existingUser.destroy();
       }
     }
 
@@ -52,15 +39,16 @@ export const createUser = asyncHandler(
 
     await user.update({
       activationToken: hashedToken,
-      activationTokenExpires: new Date(Date.now() + 24 * 60 * 60 * 1000), 
+      activationTokenExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
-
+    console.log("/*/*/*/*/*/*/*/*/*/*");
     const activationUrl = `${process.env.FRONTEND_URL}/auth/activate?token=${activationToken}`;
-
+    console.log("/*/*/*/*/*/*/*/*/*/*");
     try {
       await sendEmail(
         activationEmailTemplate(user.firstName, user.email, activationUrl)
       );
+      console.log("/*/*/*/*/*/*/*/*/*/*");
     } catch (err) {
       user.activationToken = undefined;
       user.activationTokenExpires = undefined;
