@@ -14,7 +14,7 @@ import {
 
 @Table({
   tableName: "users",
-  timestamps: true, 
+  timestamps: true,
   indexes: [
     {
       unique: true,
@@ -27,7 +27,6 @@ class User extends Model {
   @AutoIncrement
   @Column(DataType.INTEGER)
   id!: number;
-
 
   @AllowNull(false)
   @Column(DataType.STRING)
@@ -54,6 +53,11 @@ class User extends Model {
   @Column(DataType.STRING)
   phone!: string;
 
+  @Default("user")
+  @AllowNull(false)
+  @Column(DataType.ENUM("user", "admin"))
+  role!: "user" | "admin";
+
   @AllowNull(true)
   @Column(DataType.STRING)
   image?: string;
@@ -66,7 +70,6 @@ class User extends Model {
     },
   })
   password?: string;
-
 
   @Default("pending")
   @AllowNull(false)
@@ -97,14 +100,12 @@ class User extends Model {
   @Column(DataType.BOOLEAN)
   pwResetVerified!: boolean;
 
-
   @BeforeSave
   static setDefaultImage(instance: User) {
     if (!instance.image) {
       instance.image = "https://via.placeholder.com/150";
     }
   }
-
 }
 
 export interface UserType {
@@ -113,6 +114,7 @@ export interface UserType {
   lastName: string;
   email: string;
   phone: string;
+  role: "user" | "admin";
   image?: string;
   password?: string;
   status: "pending" | "active" | "inactive";
