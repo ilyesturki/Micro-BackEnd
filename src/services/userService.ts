@@ -37,6 +37,8 @@ export const createUser = asyncHandler(
       .update(activationToken)
       .digest("hex");
 
+    console.log(activationToken);
+
     await user.update({
       activationToken: hashedToken,
       activationTokenExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
