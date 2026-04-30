@@ -6,13 +6,17 @@ interface optionsType {
   html: string;
 }
 
-const sendEmail = async (options:optionsType) => {
+const sendEmail = async (options: optionsType) => {
+  console.log(process.env.EMAIL_USER);
+  console.log(process.env.EMAIL_PASSWORD);
+  console.log(process.env.EMAIL_USER);
+  console.log(options);
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD,
-    }, 
+    },
   });
   const mailOptions = {
     from: process.env.EMAIL_USER,
