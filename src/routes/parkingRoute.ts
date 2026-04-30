@@ -6,7 +6,7 @@ import { verifyQr } from "../services/qrGeneratorService";
 
 const router = express.Router();
 
-router.use(protect);
+// router.use(protect);
 router.route("/").get(getParkingSpots);
 
 router.use(allowedTo("admin"));
