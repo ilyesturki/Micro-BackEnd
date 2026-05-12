@@ -98,7 +98,7 @@ export const verifyQr = asyncHandler(
         } catch (err) {
           console.error("ThingSpeak reset error:", err);
         }
-      }, 20000);
+      }, 10000);
     } catch (err) {
       console.error("ThingSpeak error:", err);
     }
