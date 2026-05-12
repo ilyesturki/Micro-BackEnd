@@ -77,7 +77,7 @@ export const verifyQr = asyncHandler(
     try {
       // 🚪 OPEN GATE
       await fetch(
-        "https://api.thingspeak.com/update?api_key=S64WUH2AGF2RLQYU&field2=1",
+        "https://api.thingspeak.com/update?api_key=XRHEHHK35A1DMH1D&field2=1",
         {
           method: "GET",
         }
@@ -88,7 +88,7 @@ export const verifyQr = asyncHandler(
         try {
           // 🔒 CLOSE GATE
           await fetch(
-            "https://api.thingspeak.com/update?api_key=S64WUH2AGF2RLQYU&field2=0",
+            "https://api.thingspeak.com/update?api_key=XRHEHHK35A1DMH1D&field2=0",
             {
               method: "GET",
             }
