@@ -10,6 +10,7 @@ import authRoute from "./routes/authRoute";
 import userRoute from "./routes/userRoute";
 import notificationRoute from "./routes/notificationRoute";
 import parkingRoute from "./routes/parkingRoute";
+import chatRoute from "./routes/chatRoute";
 import { setupWebSocket } from "./websocket";
 import User from "./models/User";
 import Notification from "./models/Notification";
@@ -33,7 +34,7 @@ sequelize.addModels([
   DeviceToken,
   Parking,
   ParkingSpot,
-  QrSession
+  QrSession,
 ]);
 
 (async () => {
@@ -59,6 +60,7 @@ app.use("/auth", authRoute);
 app.use("/users", userRoute);
 app.use("/notifications", notificationRoute);
 app.use("/parking", parkingRoute);
+app.use("/chat", chatRoute);
 
 app.use("*", (req: Request, res: Response, next: NextFunction) => {
   next(new ApiError("Can't find this route", 404));
