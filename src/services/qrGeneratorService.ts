@@ -11,67 +11,35 @@ let ioInstance: Server; // 👈 store io globally
 
 // ✅ REUSABLE FUNCTION
 const generateAndEmitQr = async () => {
-  // 🚀 TRIGGER THINGSPEAK (OPEN GATE)
   try {
-    // OPEN GATE
-    await fetch(
-      "https://api.thingspeak.com/update?api_key=S64WUH2AGF2RLQYU&field2=1",
-      {
-        method: "GET",
-      }
-    );
+    // 🧹 Clean expired QR
+    await QrSession.destroy({
+      where: {
+        expiresAt: { [Op.lt]: new Date() },
+      },
+    });
 
-    console.log("Gate opened");
+    const qrId = uuidv4();
+    const expiresAt = new Date(Date.now() + 30 * 1000);
 
-    // ⏳ WAIT 20s THEN CLOSE GATE
-    setTimeout(async () => {
-      try {
-        await fetch(
-          "https://api.thingspeak.com/update?api_key=S64WUH2AGF2RLQYU&field2=0",
-          {
-            method: "GET",
-          }
-        );
+    await QrSession.create({
+      qrId,
+      expiresAt,
+      used: false,
+    });
 
-        console.log("Gate closed");
-      } catch (err) {
-        console.error("ThingSpeak close error:", err);
-      }
-    }, 20000); // 20 seconds
+    const payload = JSON.stringify({ qrId });
+    const qrImage = await createTempQRCode(payload);
+
+    console.log(payload);
+
+    ioInstance.emit("qr-updated", {
+      qr: qrImage,
+      qrId,
+    });
   } catch (err) {
-    console.error("ThingSpeak error:", err);
-    // ❗ we do NOT block response if IoT fails
+    console.error("QR generation error:", err);
   }
-
-  // try {
-  //   // 🧹 Clean expired QR
-  //   await QrSession.destroy({
-  //     where: {
-  //       expiresAt: { [Op.lt]: new Date() },
-  //     },
-  //   });
-
-  //   const qrId = uuidv4();
-  //   const expiresAt = new Date(Date.now() + 30 * 1000);
-
-  //   await QrSession.create({
-  //     qrId,
-  //     expiresAt,
-  //     used: false,
-  //   });
-
-  //   const payload = JSON.stringify({ qrId });
-  //   const qrImage = await createTempQRCode(payload);
-
-  //   console.log(payload);
-
-  //   ioInstance.emit("qr-updated", {
-  //     qr: qrImage,
-  //     qrId,
-  //   });
-  // } catch (err) {
-  //   console.error("QR generation error:", err);
-  // }
 };
 
 // ✅ START GENERATOR (called once)
@@ -102,21 +70,37 @@ export const verifyQr = asyncHandler(
       return next(new ApiError("QR expired or already used", 400));
     }
 
-    // ✅ mark as used
+    // ✅ mark as used ONLY ONE TIME
     qr.used = true;
     await qr.save();
 
-    // 🚀 TRIGGER THINGSPEAK (OPEN GATE)
     try {
+      // 🚪 OPEN GATE
       await fetch(
         "https://api.thingspeak.com/update?api_key=S64WUH2AGF2RLQYU&field2=1",
         {
           method: "GET",
         }
       );
+
+      // ⏳ WAIT 20s
+      setTimeout(async () => {
+        try {
+          // 🔒 CLOSE GATE
+          await fetch(
+            "https://api.thingspeak.com/update?api_key=S64WUH2AGF2RLQYU&field2=0",
+            {
+              method: "GET",
+            }
+          );
+
+          console.log("field2 reset to 0");
+        } catch (err) {
+          console.error("ThingSpeak reset error:", err);
+        }
+      }, 20000);
     } catch (err) {
       console.error("ThingSpeak error:", err);
-      // ❗ we do NOT block response if IoT fails
     }
 
     // 🚀 RESPONSE TO FRONTEND
@@ -124,10 +108,56 @@ export const verifyQr = asyncHandler(
       message: "🚪 Gate opened successfully",
     });
 
-    // 🚀 INSTANT NEW QR (NO WAIT)
+    // 🚀 GENERATE NEW QR
     await generateAndEmitQr();
   }
 );
+
+// export const verifyQr = asyncHandler(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const { qrId } = req.body;
+
+//     if (!qrId) {
+//       return next(new ApiError("QR ID required", 400));
+//     }
+
+//     const qr = await QrSession.findOne({
+//       where: {
+//         qrId,
+//         used: false,
+//       },
+//     });
+
+//     if (!qr) {
+//       return next(new ApiError("QR expired or already used", 400));
+//     }
+
+//     // ✅ mark as used
+//     qr.used = true;
+//     await qr.save();
+
+//     // 🚀 TRIGGER THINGSPEAK (OPEN GATE)
+//     try {
+//       await fetch(
+//         "https://api.thingspeak.com/update?api_key=S64WUH2AGF2RLQYU&field2=1",
+//         {
+//           method: "GET",
+//         }
+//       );
+//     } catch (err) {
+//       console.error("ThingSpeak error:", err);
+//       // ❗ we do NOT block response if IoT fails
+//     }
+
+//     // 🚀 RESPONSE TO FRONTEND
+//     res.status(200).json({
+//       message: "🚪 Gate opened successfully",
+//     });
+
+//     // 🚀 INSTANT NEW QR (NO WAIT)
+//     await generateAndEmitQr();
+//   }
+// );
 
 // ✅ VERIFY QR + INSTANT REFRESH
 // export const verifyQr = asyncHandler(
