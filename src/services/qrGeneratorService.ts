@@ -11,35 +11,67 @@ let ioInstance: Server; // 👈 store io globally
 
 // ✅ REUSABLE FUNCTION
 const generateAndEmitQr = async () => {
+  // 🚀 TRIGGER THINGSPEAK (OPEN GATE)
   try {
-    // 🧹 Clean expired QR
-    await QrSession.destroy({
-      where: {
-        expiresAt: { [Op.lt]: new Date() },
-      },
-    });
+    // OPEN GATE
+    await fetch(
+      "https://api.thingspeak.com/update?api_key=S64WUH2AGF2RLQYU&field2=1",
+      {
+        method: "GET",
+      }
+    );
 
-    const qrId = uuidv4();
-    const expiresAt = new Date(Date.now() + 30 * 1000);
+    console.log("Gate opened");
 
-    await QrSession.create({
-      qrId,
-      expiresAt,
-      used: false,
-    });
+    // ⏳ WAIT 20s THEN CLOSE GATE
+    setTimeout(async () => {
+      try {
+        await fetch(
+          "https://api.thingspeak.com/update?api_key=S64WUH2AGF2RLQYU&field2=0",
+          {
+            method: "GET",
+          }
+        );
 
-    const payload = JSON.stringify({ qrId });
-    const qrImage = await createTempQRCode(payload);
-
-    console.log(payload);
-
-    ioInstance.emit("qr-updated", {
-      qr: qrImage,
-      qrId,
-    });
+        console.log("Gate closed");
+      } catch (err) {
+        console.error("ThingSpeak close error:", err);
+      }
+    }, 20000); // 20 seconds
   } catch (err) {
-    console.error("QR generation error:", err);
+    console.error("ThingSpeak error:", err);
+    // ❗ we do NOT block response if IoT fails
   }
+
+  // try {
+  //   // 🧹 Clean expired QR
+  //   await QrSession.destroy({
+  //     where: {
+  //       expiresAt: { [Op.lt]: new Date() },
+  //     },
+  //   });
+
+  //   const qrId = uuidv4();
+  //   const expiresAt = new Date(Date.now() + 30 * 1000);
+
+  //   await QrSession.create({
+  //     qrId,
+  //     expiresAt,
+  //     used: false,
+  //   });
+
+  //   const payload = JSON.stringify({ qrId });
+  //   const qrImage = await createTempQRCode(payload);
+
+  //   console.log(payload);
+
+  //   ioInstance.emit("qr-updated", {
+  //     qr: qrImage,
+  //     qrId,
+  //   });
+  // } catch (err) {
+  //   console.error("QR generation error:", err);
+  // }
 };
 
 // ✅ START GENERATOR (called once)
